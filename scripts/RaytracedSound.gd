@@ -8,7 +8,6 @@ var filter : AudioEffectLowPassFilter
 var target_cutoff : float = 20000.0
 var current_cutoff : float = 20000.0
 var occlusion_percentage : float = 0.0
-var line_of_sight_points : Array[Vector2]
 var color : Color = Color.from_hsv(randf(),randf_range(0.2, 0.6),randf_range(0.9, 1.0))
 
 const SMOOTH_SPEED = 5.0

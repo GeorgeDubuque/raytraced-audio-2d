@@ -31,3 +31,4 @@ position = Vector2(0, 0)
 num_rays = 1000
 draw_debug_rays = false
 max_reverb_distance = 8000.0
+max_wall_thickness = 120.0
