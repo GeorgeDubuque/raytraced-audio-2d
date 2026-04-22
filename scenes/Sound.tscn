@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cloyojniitmyp"]
 
 [ext_resource type="Texture2D" uid="uid://bw6x0h7b5846p" path="res://sound_icon.png" id="1_wvsce"]
-[ext_resource type="Script" uid="uid://cfv4gubkmlojs" path="res://RaytracedSound.gd" id="1_ywcv5"]
-[ext_resource type="AudioStream" uid="uid://bagcyeg523c2k" path="res://Pikmin Music： The Forest of Hope.mp3" id="2_npid4"]
+[ext_resource type="Script" uid="uid://cfv4gubkmlojs" path="res://scripts/RaytracedSound.gd" id="1_ywcv5"]
+[ext_resource type="AudioStream" uid="uid://bagcyeg523c2k" path="res://sounds/Pikmin Music： The Forest of Hope.mp3" id="2_npid4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wvsce"]
 size = Vector2(40, 32)

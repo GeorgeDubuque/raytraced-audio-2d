@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgjgcb13b30q8"]
 
-[ext_resource type="Script" uid="uid://b28utaqruwlc3" path="res://raytraced_audio_listener.gd" id="1_brjde"]
+[ext_resource type="Script" uid="uid://b28utaqruwlc3" path="res://scripts/raytraced_audio_listener.gd" id="1_brjde"]
 
 [node name="RaytracedAudioListener" type="Node2D" unique_id=1741400250]
 position = Vector2(-32, 32)

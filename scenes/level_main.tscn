@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c0th50pdobsul"]
 
-[ext_resource type="PackedScene" uid="uid://djd4lge8h83n" path="res://player.tscn" id="1_1rrhw"]
-[ext_resource type="PackedScene" uid="uid://cloyojniitmyp" path="res://Sound.tscn" id="2_msnib"]
-[ext_resource type="AudioStream" uid="uid://bpne4sxpxt3si" path="res://Persona 4 - Specialist.mp3" id="3_i3xgx"]
-[ext_resource type="AudioStream" uid="uid://bxskag4sb42tj" path="res://footstep_wood_2.wav" id="4_i3xgx"]
+[ext_resource type="PackedScene" uid="uid://djd4lge8h83n" path="res://scenes/player.tscn" id="1_1rrhw"]
+[ext_resource type="PackedScene" uid="uid://cloyojniitmyp" path="res://scenes/Sound.tscn" id="2_msnib"]
+[ext_resource type="AudioStream" uid="uid://bpne4sxpxt3si" path="res://sounds/Persona 4 - Specialist.mp3" id="3_i3xgx"]
+[ext_resource type="AudioStream" uid="uid://bxskag4sb42tj" path="res://sounds/footstep_wood_2.wav" id="4_i3xgx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1rrhw"]
 

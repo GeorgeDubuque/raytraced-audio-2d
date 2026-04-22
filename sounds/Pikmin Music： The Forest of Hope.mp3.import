@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bagcyeg523c2k"
+path="res://.godot/imported/Pikmin Music： The Forest of Hope.mp3-865beea023fb34757c7068192185a3df.mp3str"
+
+[deps]
+
+source_file="res://sounds/Pikmin Music： The Forest of Hope.mp3"
+dest_files=["res://.godot/imported/Pikmin Music： The Forest of Hope.mp3-865beea023fb34757c7068192185a3df.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
