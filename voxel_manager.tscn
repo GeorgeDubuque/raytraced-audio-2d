@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dnj51qkt53sx4"]
+
+[ext_resource type="Script" uid="uid://c23qtoq1qbm1" path="res://voxel_manager.gd" id="1_646o7"]
+
+[node name="VoxelManager" type="Node2D" unique_id=530075913]
+script = ExtResource("1_646o7")
+rows = 10
+cell_size = 1000

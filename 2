@@ -1,0 +1,192 @@
+extends Node2D
+
+class PenisRay:
+	var points : Array[Vector2]
+	var point_inside_map : Dictionary # Vector2 -> boolean
+
+class AudioRay:
+	var points : Array[Vector2]
+	var color : Color
+	var hit_sound_node : Node = null
+	var returned_to_player : bool = false
+	var total_distance : float = 0.0
+
+@export var max_bounces : int = 10
+@export var num_rays : int = 16
+@export var draw_debug_rays : bool = false
+@export var draw_penetretive_rays : bool = false
+@export var max_reverb_distance : float = 2000.0
+@export var max_ray_distance : float = 2000.0
+
+
+var audio_rays : Array[AudioRay]
+var occlusion_rays : Array[PenisRay]
+var prev_pos: Vector2
+var sound_nodes : Array[Node]
+var reverb_effect : AudioEffectReverb
+var hit_counts : Dictionary = {}
+
+func _ready() -> void:
+	sound_nodes = get_tree().get_nodes_in_group("sound")
+	get_tree().node_added.connect(_on_node_added)
+	get_tree().node_removed.connect(_on_node_removed)
+	_setup_reverb_bus()
+
+func _setup_reverb_bus() -> void:
+	if AudioServer.get_bus_index("Reverb") != -1:
+		reverb_effect = AudioServer.get_bus_effect(AudioServer.get_bus_index("Reverb"), 0)
+		return
+	AudioServer.add_bus()
+	var idx = AudioServer.bus_count - 1
+	AudioServer.set_bus_name(idx, "Reverb")
+	AudioServer.set_bus_send(idx, "Master")
+	reverb_effect = AudioEffectReverb.new()
+	reverb_effect.wet = 0.0
+	AudioServer.add_bus_effect(idx, reverb_effect)
+
+func _on_node_added(node: Node) -> void:
+	if node.is_in_group("sound"):
+		sound_nodes.append(node)
+
+func _on_node_removed(node: Node) -> void:
+	sound_nodes.erase(node)
+
+func _process(_delta: float) -> void:
+	if prev_pos != global_position:
+		audio_rays.clear()
+		hit_counts.clear()
+		occlusion_rays.clear()
+		for i in range(num_rays):
+			var angle = (TAU / num_rays) * i
+			var dir = Vector2.RIGHT.rotated(angle)
+			var new_ray = cast_ray(dir)
+			new_ray.color = Color.RED
+			audio_rays.append(new_ray)
+
+		for sound_node in sound_nodes:
+			if not sound_node.has_method("set_volume_ratio"):
+				continue
+			var ratio = float(hit_counts.get(sound_node, 0)) / num_rays
+			sound_node.set_volume_ratio(ratio)
+
+		# Blue rays: compute reverb from rays that bounced back to the player
+		var echo_rays = audio_rays.filter(func(r): return r.returned_to_player)
+		if echo_rays.size() > 0:
+			var avg_distance = 0.0
+			for ray in echo_rays:
+				avg_distance += ray.total_distance
+			avg_distance /= echo_rays.size()
+			reverb_effect.room_size = clampf(avg_distance / max_reverb_distance, 0.0, 1.0)
+			reverb_effect.wet = clampf(float(echo_rays.size()) / num_rays, 0.0, 1.0)
+		else:
+			reverb_effect.wet = 0.0
+
+
+		var space_state = get_world_2d().direct_space_state
+		for sound_node : Node2D in sound_nodes:
+			var penis_ray : PenisRay = PenisRay.new()
+			var curr_pos : Vector2 = global_position
+			var inside_wall = false
+			var max_num_times = 5
+			var num_times = 0
+			while num_times < max_num_times:
+				penis_ray.points.append(curr_pos)
+				penis_ray.point_inside_map[curr_pos] = inside_wall
+				var query = PhysicsRayQueryParameters2D.create(curr_pos, sound_node.global_position)
+				query.hit_from_inside = true
+				query.exclude = [self]
+				var result = space_state.intersect_ray(query)
+				if result.collider:
+					curr_pos = result.position
+					curr_pos += (sound_node.global_position - curr_pos).normalized() * 3.0
+					inside_wall = !inside_wall
+					print(result.collider)
+				else:
+					hit_sound = true
+
+				if result.collider == sound_node:
+					hit_sound = true
+
+				num_times += 1
+
+			occlusion_rays.append(penis_ray)
+			break;
+
+		print("-------------------------------------------------")
+
+		queue_redraw()
+
+	prev_pos = global_position
+
+func cast_ray(dir : Vector2) -> AudioRay:
+	var new_ray : AudioRay = AudioRay.new()
+	var space_state = get_world_2d().direct_space_state
+
+	var current_pos = global_position
+	var current_dir = dir
+
+	new_ray.points.append(current_pos)
+
+	for i in range(max_bounces):
+		var target = current_pos + (current_dir * max_ray_distance)
+		var query = PhysicsRayQueryParameters2D.create(current_pos, target)
+
+		# Exclude player on first segment only — after bouncing, allow it to be hit for echo detection
+		if i == 0:
+			query.exclude = [get_parent().get_rid()]
+
+		var result = space_state.intersect_ray(query)
+
+		if result:
+			var segment_dist = current_pos.distance_to(result.position)
+			new_ray.total_distance += segment_dist
+			new_ray.points.append(result.position)
+
+			# returned to player
+			if result.collider == get_parent():
+				new_ray.returned_to_player = true
+				return new_ray
+
+			# hit a sound
+			if result.collider.is_in_group("sound"):
+				new_ray.hit_sound_node = result.collider
+				hit_counts[result.collider] = hit_counts.get(result.collider, 0) + 1
+				return new_ray
+
+			current_dir = current_dir.bounce(result.normal).normalized()
+			current_pos = result.position + (result.normal * 0.5)
+		# escaped outside
+		else:
+			new_ray.total_distance += current_pos.distance_to(target)
+			new_ray.points.append(target)
+			break
+
+	return new_ray
+
+func _draw() -> void:
+	if draw_debug_rays:
+		for audio_ray in audio_rays:
+			for i in range(audio_ray.points.size() - 1):
+				var p1 = to_local(audio_ray.points[i])
+				draw_circle(p1, 5, Color(0.0, 1, 0, 0.5))
+				var p2 = to_local(audio_ray.points[i+1])
+				draw_circle(p2, 5, Color(0.0, 0, 1, 0.5))
+				if audio_ray.returned_to_player:
+					draw_line(p1, p2, Color.BLUE, 1.0)
+				elif audio_ray.hit_sound_node:
+					draw_line(p1, p2, Color.GREEN, 1.0)
+				else:
+					draw_line(p1, p2, audio_ray.color, 1.0)
+
+	if draw_penetretive_rays:
+		for penis_ray : PenisRay in occlusion_rays:
+			for i in range(penis_ray.points.size() - 1):
+				var p1 = to_local(penis_ray.points[i])
+				var p2 = to_local(penis_ray.points[i+1])
+				if penis_ray.point_inside_map[penis_ray.points[i]]:
+					draw_dashed_line(p1, p2, Color.YELLOW_GREEN, 1.0)
+				else:
+					draw_line(p1, p2, Color.YELLOW_GREEN, 1.0)
+
+
+		

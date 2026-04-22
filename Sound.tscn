@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cloyojniitmyp"]
+
+[ext_resource type="Texture2D" uid="uid://bw6x0h7b5846p" path="res://sound_icon.png" id="1_wvsce"]
+[ext_resource type="Script" uid="uid://cfv4gubkmlojs" path="res://RaytracedSound.gd" id="1_ywcv5"]
+[ext_resource type="AudioStream" uid="uid://bagcyeg523c2k" path="res://Pikmin Music： The Forest of Hope.mp3" id="2_npid4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wvsce"]
+size = Vector2(40, 32)
+
+[node name="Sound" type="Node2D" unique_id=1917325130]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=430496697 groups=["sound"]]
+script = ExtResource("1_ywcv5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1525804718]
+shape = SubResource("RectangleShape2D_wvsce")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D" unique_id=560687595]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_wvsce")
+
+[node name="Sound" type="AudioStreamPlayer2D" parent="StaticBody2D" unique_id=1217717128 groups=["sound"]]
+stream = ExtResource("2_npid4")
+autoplay = true
+max_distance = 1000.0
+panning_strength = 3.0
+parameters/looping = true

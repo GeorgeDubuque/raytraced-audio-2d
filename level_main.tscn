@@ -1,0 +1,398 @@
+[gd_scene format=3 uid="uid://c0th50pdobsul"]
+
+[ext_resource type="PackedScene" uid="uid://djd4lge8h83n" path="res://player.tscn" id="1_1rrhw"]
+[ext_resource type="PackedScene" uid="uid://cloyojniitmyp" path="res://Sound.tscn" id="2_msnib"]
+[ext_resource type="AudioStream" uid="uid://bpne4sxpxt3si" path="res://Persona 4 - Specialist.mp3" id="3_i3xgx"]
+[ext_resource type="AudioStream" uid="uid://bxskag4sb42tj" path="res://footstep_wood_2.wav" id="4_i3xgx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1rrhw"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1rrhw"]
+radius = 36.37
+
+[node name="Level_Main" type="Node2D" unique_id=1995993742]
+
+[node name="Player" parent="." unique_id=375442914 instance=ExtResource("1_1rrhw")]
+position = Vector2(-1020, -1060)
+speed = 500.0
+
+[node name="Environment" type="Node2D" parent="." unique_id=986683072]
+
+[node name="Wall" type="StaticBody2D" parent="Environment" unique_id=411102879]
+position = Vector2(304, -95.99999)
+rotation = 0.113735095
+scale = Vector2(5.8635654, -14.982042)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall" unique_id=303048068]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall6" type="StaticBody2D" parent="Environment" unique_id=1995594904]
+position = Vector2(2160, -1712)
+rotation = -0.0056090876
+scale = Vector2(5.8635654, -68.975815)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall6" unique_id=1458154977]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall8" type="StaticBody2D" parent="Environment" unique_id=1025609795]
+position = Vector2(1520.0001, -2288.0002)
+rotation = 1.580217
+scale = Vector2(1.744122, -68.975815)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall8" unique_id=916958308]
+scale = Vector2(0.99999994, 1)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall9" type="StaticBody2D" parent="Environment" unique_id=683545251]
+position = Vector2(1000, -1056.0001)
+rotation = 1.580217
+scale = Vector2(5.8635654, -27.669003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall9" unique_id=1790701901]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall10" type="StaticBody2D" parent="Environment" unique_id=1107134396]
+position = Vector2(1872, -1056.0001)
+rotation = 1.580217
+scale = Vector2(5.8635654, -27.669003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall10" unique_id=711672330]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall7" type="StaticBody2D" parent="Environment" unique_id=2067554700]
+position = Vector2(1048, -1703.9999)
+rotation = -0.0056090876
+scale = Vector2(5.8635654, -68.975815)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall7" unique_id=1930379138]
+position = Vector2(19.108356, 0.106874615)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall11" type="StaticBody2D" parent="Environment" unique_id=879682172]
+position = Vector2(3719.9998, -1776)
+rotation = -0.0056090876
+scale = Vector2(5.8635654, -19.946003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall11" unique_id=850514077]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall12" type="StaticBody2D" parent="Environment" unique_id=778859971]
+position = Vector2(3632.0002, -2352)
+rotation = 1.580217
+scale = Vector2(5.8635654, -68.975815)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall12" unique_id=142145997]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall13" type="StaticBody2D" parent="Environment" unique_id=1780750453]
+position = Vector2(3216.0002, -1056.0001)
+rotation = 1.580217
+scale = Vector2(5.8635654, -27.669003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall13" unique_id=921960713]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall14" type="StaticBody2D" parent="Environment" unique_id=234500726]
+position = Vector2(4088.0002, -1056.0001)
+rotation = 1.580217
+scale = Vector2(5.8635654, -27.669003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall14" unique_id=488710136]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall15" type="StaticBody2D" parent="Environment" unique_id=922595227]
+position = Vector2(3328, -1768.0001)
+rotation = -0.0056090876
+scale = Vector2(5.8635654, -19.946003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall15" unique_id=853683084]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall16" type="StaticBody2D" parent="Environment" unique_id=551074645]
+position = Vector2(3520.0002, -2000.0005)
+rotation = 1.5711823
+scale = Vector2(5.8635654, -19.946003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall16" unique_id=1789295272]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall17" type="StaticBody2D" parent="Environment" unique_id=1714157130]
+position = Vector2(3344, -1544.0001)
+rotation = 1.5711823
+scale = Vector2(5.8635654, -19.946003)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall17" unique_id=303844762]
+position = Vector2(0, -2.54618e-07)
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall2" type="StaticBody2D" parent="Environment" unique_id=540692048]
+position = Vector2(-256, -40.000004)
+scale = Vector2(5.8635654, -14.982042)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall2" unique_id=1050567009]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall3" type="StaticBody2D" parent="Environment" unique_id=81498327]
+position = Vector2(-70, -339.99997)
+rotation = 1.3748574
+scale = Vector2(5.8635654, -14.982042)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall3" unique_id=1902380906]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall18" type="StaticBody2D" parent="Environment" unique_id=606260071]
+position = Vector2(-1190, -1650)
+scale = Vector2(1, 13)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall18" unique_id=153649522]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall19" type="StaticBody2D" parent="Environment" unique_id=1484970871]
+position = Vector2(-910, -1650)
+scale = Vector2(1, 13)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall19" unique_id=843207018]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall20" type="StaticBody2D" parent="Environment" unique_id=977173641]
+position = Vector2(-1050, -1790)
+rotation = -1.5707964
+scale = Vector2(1, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall20" unique_id=753947173]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall21" type="StaticBody2D" parent="Environment" unique_id=1489633456]
+position = Vector2(-1050, -1510)
+rotation = -1.5719053
+scale = Vector2(1, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall21" unique_id=142799443]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall4" type="StaticBody2D" parent="Environment" unique_id=75743626]
+position = Vector2(119.99999, 224.00003)
+rotation = -1.7975218
+scale = Vector2(5.8635654, -14.982042)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall4" unique_id=783904760]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall5" type="StaticBody2D" parent="Environment" unique_id=1005005562]
+position = Vector2(-239.99998, 304)
+rotation = -1.2583784
+scale = Vector2(5.8635654, -14.982042)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall5" unique_id=1579717302]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Pole" type="StaticBody2D" parent="Environment" unique_id=912877958]
+position = Vector2(-24.000122, -144)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Pole" unique_id=217733322]
+position = Vector2(6.3987663e-06, -7.753367e-06)
+shape = SubResource("CircleShape2D_1rrhw")
+
+[node name="Sound" parent="Environment" unique_id=1917325130 groups=["sound"] instance=ExtResource("2_msnib")]
+position = Vector2(-120, -40)
+
+[node name="Sound2" parent="Environment" unique_id=848822124 groups=["sound"] instance=ExtResource("2_msnib")]
+position = Vector2(1416, -2064)
+
+[node name="Sound" parent="Environment/Sound2/StaticBody2D" parent_id_path=PackedInt32Array(848822124, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("3_i3xgx")
+
+[node name="Sound3" parent="Environment" unique_id=1487197543 groups=["sound"] instance=ExtResource("2_msnib")]
+position = Vector2(3512, -1840)
+
+[node name="Sound" parent="Environment/Sound3/StaticBody2D" parent_id_path=PackedInt32Array(1487197543, 430496697) index="2" unique_id=1217717128]
+position = Vector2(0, -1)
+stream = ExtResource("3_i3xgx")
+
+[node name="Sound4" parent="Environment" unique_id=467462446 instance=ExtResource("2_msnib")]
+position = Vector2(-1050, -1650)
+
+[node name="Sound" parent="Environment/Sound4/StaticBody2D" parent_id_path=PackedInt32Array(467462446, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("4_i3xgx")
+
+[node name="Wall22" type="StaticBody2D" parent="Environment" unique_id=1799543657]
+position = Vector2(-1580, -1650)
+scale = Vector2(2, 11)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall22" unique_id=1572227370]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall23" type="StaticBody2D" parent="Environment" unique_id=1991470112]
+position = Vector2(-1320, -1650)
+scale = Vector2(2, 11)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall23" unique_id=710463623]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall24" type="StaticBody2D" parent="Environment" unique_id=259112055]
+position = Vector2(-1450.0001, -1780)
+rotation = -1.5707964
+scale = Vector2(2, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall24" unique_id=678233126]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall25" type="StaticBody2D" parent="Environment" unique_id=894316552]
+position = Vector2(-1450, -1520)
+rotation = -1.5719053
+scale = Vector2(2, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall25" unique_id=1991660752]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Sound5" parent="Environment" unique_id=1502059367 instance=ExtResource("2_msnib")]
+position = Vector2(-1450, -1650)
+
+[node name="Sound" parent="Environment/Sound5/StaticBody2D" parent_id_path=PackedInt32Array(1502059367, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("4_i3xgx")
+
+[node name="Wall26" type="StaticBody2D" parent="Environment" unique_id=2010611439]
+position = Vector2(-1970, -1650)
+scale = Vector2(3, 9)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall26" unique_id=176880384]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall27" type="StaticBody2D" parent="Environment" unique_id=730944478]
+position = Vector2(-1730.0001, -1650)
+scale = Vector2(3, 9)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall27" unique_id=1889822756]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall28" type="StaticBody2D" parent="Environment" unique_id=892636362]
+position = Vector2(-1850.0001, -1770)
+rotation = -1.5707964
+scale = Vector2(3, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall28" unique_id=1719801904]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall29" type="StaticBody2D" parent="Environment" unique_id=642965400]
+position = Vector2(-1850, -1529.9999)
+rotation = -1.5719053
+scale = Vector2(3, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall29" unique_id=731604976]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Sound6" parent="Environment" unique_id=60405093 instance=ExtResource("2_msnib")]
+position = Vector2(-1850, -1650)
+
+[node name="Sound" parent="Environment/Sound6/StaticBody2D" parent_id_path=PackedInt32Array(60405093, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("4_i3xgx")
+
+[node name="Wall30" type="StaticBody2D" parent="Environment" unique_id=457938083]
+position = Vector2(-2750, -1650)
+scale = Vector2(5, 5)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall30" unique_id=1974764011]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall31" type="StaticBody2D" parent="Environment" unique_id=1028037976]
+position = Vector2(-2550, -1650)
+scale = Vector2(5, 5)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall31" unique_id=696306041]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall32" type="StaticBody2D" parent="Environment" unique_id=542201621]
+position = Vector2(-2650.0002, -1750)
+rotation = -1.5707964
+scale = Vector2(5, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall32" unique_id=1834073874]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall33" type="StaticBody2D" parent="Environment" unique_id=112448534]
+position = Vector2(-2650, -1549.9999)
+rotation = -1.5719053
+scale = Vector2(5, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall33" unique_id=1284826466]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Sound7" parent="Environment" unique_id=163357772 instance=ExtResource("2_msnib")]
+position = Vector2(-2650, -1650)
+
+[node name="Sound" parent="Environment/Sound7/StaticBody2D" parent_id_path=PackedInt32Array(163357772, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("4_i3xgx")
+
+[node name="Wall34" type="StaticBody2D" parent="Environment" unique_id=2107627779]
+position = Vector2(-2360, -1650)
+scale = Vector2(4, 7)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall34" unique_id=1494106726]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall35" type="StaticBody2D" parent="Environment" unique_id=902367431]
+position = Vector2(-2140, -1650)
+scale = Vector2(4, 7)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall35" unique_id=1464211724]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall36" type="StaticBody2D" parent="Environment" unique_id=818996467]
+position = Vector2(-2250.0002, -1760)
+rotation = -1.5707964
+scale = Vector2(4, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall36" unique_id=2025164741]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall37" type="StaticBody2D" parent="Environment" unique_id=2117179551]
+position = Vector2(-2250, -1540)
+rotation = -1.5719053
+scale = Vector2(4, 15)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall37" unique_id=306379651]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Sound8" parent="Environment" unique_id=1328795786 instance=ExtResource("2_msnib")]
+position = Vector2(-2250, -1650)
+
+[node name="Sound" parent="Environment/Sound8/StaticBody2D" parent_id_path=PackedInt32Array(1328795786, 430496697) index="2" unique_id=1217717128]
+stream = ExtResource("4_i3xgx")
+
+[editable path="Environment/Sound2"]
+[editable path="Environment/Sound3"]
+[editable path="Environment/Sound4"]
+[editable path="Environment/Sound5"]
+[editable path="Environment/Sound6"]
+[editable path="Environment/Sound7"]
+[editable path="Environment/Sound8"]

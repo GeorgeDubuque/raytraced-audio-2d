@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://emyjol85evfr"
+path="res://.godot/imported/C418  - Sweden - Minecraft Volume Alpha.mp3-0acbd0daa1a7482ce390adbfe4a7adbb.mp3str"
+
+[deps]
+
+source_file="res://C418  - Sweden - Minecraft Volume Alpha.mp3"
+dest_files=["res://.godot/imported/C418  - Sweden - Minecraft Volume Alpha.mp3-0acbd0daa1a7482ce390adbfe4a7adbb.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

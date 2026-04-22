@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://djd4lge8h83n"]
+
+[ext_resource type="Script" uid="uid://c1ols0k0oysq5" path="res://player.gd" id="1_4flbx"]
+[ext_resource type="Texture2D" uid="uid://bqdyi5j0cca0e" path="res://icon.svg" id="2_onrkg"]
+[ext_resource type="PackedScene" uid="uid://cgjgcb13b30q8" path="res://RaytracedAudioListener.tscn" id="3_i3pqv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4flbx"]
+radius = 50.0
+
+[node name="Player" type="Node2D" unique_id=375442914]
+script = ExtResource("1_4flbx")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=322201759]
+motion_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=739951831]
+shape = SubResource("CircleShape2D_4flbx")
+debug_color = Color(0, 0.5982799, 0.7117245, 0.41960785)
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=111474417]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_onrkg")
+
+[node name="Camera2D" type="Camera2D" parent="CharacterBody2D" unique_id=1720728771]
+
+[node name="AudioListener2D" type="AudioListener2D" parent="CharacterBody2D/Camera2D" unique_id=228576423]
+current = true
+
+[node name="RaytracedAudioListener" parent="CharacterBody2D" unique_id=1741400250 instance=ExtResource("3_i3pqv")]
+position = Vector2(0, 0)
+num_rays = 1000
+draw_debug_rays = false
+max_reverb_distance = 8000.0
