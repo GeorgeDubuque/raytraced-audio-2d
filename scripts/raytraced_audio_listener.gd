@@ -20,7 +20,6 @@ class SoundData:
 	var sound: RaytracedSound
 	var hit_count: int = 0
 	var portal_locations: Array[Vector2]
-	var portal_location: Vector2 = Vector2.ZERO
 
 	func _init(new_sound: RaytracedSound):
 		sound = new_sound
@@ -40,6 +39,7 @@ class AudioRay:
 	var reflected_to_player: bool = false
 	var reflection_distance: float = 0.0
 	var last_line_of_sight: Vector2
+	var has_los: bool = false
 	var escaped: bool = false
 
 
@@ -207,14 +207,13 @@ func cast_ray(dir: Vector2) -> AudioRay:
 					curr_sound_data.hit_count += 1
 
 					if (
-						new_ray.last_line_of_sight
+						new_ray.has_los
 						and (
 							new_ray.reflection_distance
 							< curr_sound_data.sound.sound.max_distance * 2
 						)
 					):
 						curr_sound_data.portal_locations.append(new_ray.last_line_of_sight)
-						curr_sound_data.portal_location += new_ray.last_line_of_sight
 
 					sound_data[sound_id] = curr_sound_data
 
@@ -226,6 +225,7 @@ func cast_ray(dir: Vector2) -> AudioRay:
 				var los_result = space_state.intersect_ray(los_query)
 				if los_result and los_result.collider == get_parent():
 					new_ray.last_line_of_sight = result.position
+					new_ray.has_los = true
 
 				# bounce off collider
 				current_dir = current_dir.bounce(result.normal).normalized()
@@ -274,14 +274,18 @@ func _process(_delta: float) -> void:
 				for portal_loc in curr_sound_data.portal_locations:
 					avg_portal_loc += portal_loc
 				avg_portal_loc /= curr_sound_data.portal_locations.size()
-				var actual_pos = (
+				var portal_pos = (
 					global_position + (avg_portal_loc - global_position).normalized() * 500
 				)
-				sound_node.portal_sound.global_position = avg_portal_loc
+				sound_node.portal_sound.global_position = portal_pos
+				var portal_ratio = float(curr_sound_data.portal_locations.size()) / num_rays
+				sound_node.portal_sound.volume_db = linear_to_db(portal_ratio)
 			else:
 				sound_node.portal_sound.position = Vector2.ZERO
+				sound_node.portal_sound.volume_db = -100.0
 		else:
 			sound_node.portal_sound.position = Vector2.ZERO
+			sound_node.portal_sound.volume_db = 0.0
 
 	# compute reverb from rays that bounced back to the player
 	var avg_reverb_distance = 0.0
@@ -391,17 +395,12 @@ func _draw() -> void:
 				14,
 				Color.WHITE
 			)
-			draw_string(
-				ThemeDB.fallback_font,
-				label_pos + Vector2(0, -60),
-				"Attenuation: %.1f" % occlusion_ray.sound.sound.get_attenuation(),
-				HORIZONTAL_ALIGNMENT_CENTER,
-				-1,
-				14,
-				Color.WHITE
-			)
 
 	if draw_portal_positions:
 		for curr_sound_data: SoundData in sound_data.values():
 			if curr_sound_data.portal_locations.size() > 0:
-				draw_circle(to_local(curr_sound_data.portal_location), 5.0, Color.PURPLE, true)
+				var avg: Vector2 = Vector2.ZERO
+				for loc in curr_sound_data.portal_locations:
+					avg += loc
+				avg /= curr_sound_data.portal_locations.size()
+				draw_circle(to_local(avg), 5.0, Color.PURPLE, true)
