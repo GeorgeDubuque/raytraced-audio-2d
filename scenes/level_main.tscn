@@ -14,7 +14,12 @@ radius = 36.37
 
 [node name="Player" parent="." unique_id=375442914 instance=ExtResource("1_1rrhw")]
 position = Vector2(-1020, -1060)
-speed = 500.0
+speed = 800.0
+
+[node name="RaytracedAudioListener" parent="Player/CharacterBody2D" parent_id_path=PackedInt32Array(375442914, 322201759) index="3" unique_id=1741400250]
+num_rays = 100
+draw_debug_rays = true
+draw_portal_positions = true
 
 [node name="Environment" type="Node2D" parent="." unique_id=986683072]
 
@@ -213,20 +218,21 @@ position = Vector2(-120, -40)
 [node name="Sound2" parent="Environment" unique_id=848822124 groups=["sound"] instance=ExtResource("2_msnib")]
 position = Vector2(1416, -2064)
 
-[node name="Sound" parent="Environment/Sound2/StaticBody2D" parent_id_path=PackedInt32Array(848822124, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound2/StaticBody2D" parent_id_path=PackedInt32Array(848822124, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("3_i3xgx")
+max_distance = 2000.0
 
 [node name="Sound3" parent="Environment" unique_id=1487197543 groups=["sound"] instance=ExtResource("2_msnib")]
 position = Vector2(3512, -1840)
 
-[node name="Sound" parent="Environment/Sound3/StaticBody2D" parent_id_path=PackedInt32Array(1487197543, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound3/StaticBody2D" parent_id_path=PackedInt32Array(1487197543, 430496697) index="1" unique_id=1217717128]
 position = Vector2(0, -1)
 stream = ExtResource("3_i3xgx")
 
 [node name="Sound4" parent="Environment" unique_id=467462446 instance=ExtResource("2_msnib")]
 position = Vector2(-1050, -1650)
 
-[node name="Sound" parent="Environment/Sound4/StaticBody2D" parent_id_path=PackedInt32Array(467462446, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound4/StaticBody2D" parent_id_path=PackedInt32Array(467462446, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_i3xgx")
 
 [node name="Wall22" type="StaticBody2D" parent="Environment" unique_id=1799543657]
@@ -266,7 +272,7 @@ shape = SubResource("RectangleShape2D_1rrhw")
 [node name="Sound5" parent="Environment" unique_id=1502059367 instance=ExtResource("2_msnib")]
 position = Vector2(-1450, -1650)
 
-[node name="Sound" parent="Environment/Sound5/StaticBody2D" parent_id_path=PackedInt32Array(1502059367, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound5/StaticBody2D" parent_id_path=PackedInt32Array(1502059367, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_i3xgx")
 
 [node name="Wall26" type="StaticBody2D" parent="Environment" unique_id=2010611439]
@@ -306,7 +312,7 @@ shape = SubResource("RectangleShape2D_1rrhw")
 [node name="Sound6" parent="Environment" unique_id=60405093 instance=ExtResource("2_msnib")]
 position = Vector2(-1850, -1650)
 
-[node name="Sound" parent="Environment/Sound6/StaticBody2D" parent_id_path=PackedInt32Array(60405093, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound6/StaticBody2D" parent_id_path=PackedInt32Array(60405093, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_i3xgx")
 
 [node name="Wall30" type="StaticBody2D" parent="Environment" unique_id=457938083]
@@ -346,7 +352,7 @@ shape = SubResource("RectangleShape2D_1rrhw")
 [node name="Sound7" parent="Environment" unique_id=163357772 instance=ExtResource("2_msnib")]
 position = Vector2(-2650, -1650)
 
-[node name="Sound" parent="Environment/Sound7/StaticBody2D" parent_id_path=PackedInt32Array(163357772, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound7/StaticBody2D" parent_id_path=PackedInt32Array(163357772, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_i3xgx")
 
 [node name="Wall34" type="StaticBody2D" parent="Environment" unique_id=2107627779]
@@ -386,9 +392,10 @@ shape = SubResource("RectangleShape2D_1rrhw")
 [node name="Sound8" parent="Environment" unique_id=1328795786 instance=ExtResource("2_msnib")]
 position = Vector2(-2250, -1650)
 
-[node name="Sound" parent="Environment/Sound8/StaticBody2D" parent_id_path=PackedInt32Array(1328795786, 430496697) index="2" unique_id=1217717128]
+[node name="Sound" parent="Environment/Sound8/StaticBody2D" parent_id_path=PackedInt32Array(1328795786, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_i3xgx")
 
+[editable path="Player"]
 [editable path="Environment/Sound2"]
 [editable path="Environment/Sound3"]
 [editable path="Environment/Sound4"]

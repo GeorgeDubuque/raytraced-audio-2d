@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://cloyojniitmyp"]
 
-[ext_resource type="Texture2D" uid="uid://bw6x0h7b5846p" path="res://sound_icon.png" id="1_wvsce"]
 [ext_resource type="Script" uid="uid://cfv4gubkmlojs" path="res://scripts/RaytracedSound.gd" id="1_ywcv5"]
 [ext_resource type="AudioStream" uid="uid://bagcyeg523c2k" path="res://sounds/Pikmin Music： The Forest of Hope.mp3" id="2_npid4"]
 
@@ -13,11 +12,8 @@ size = Vector2(40, 32)
 script = ExtResource("1_ywcv5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1525804718]
+scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_wvsce")
-
-[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D" unique_id=560687595]
-scale = Vector2(0.2, 0.2)
-texture = ExtResource("1_wvsce")
 
 [node name="Sound" type="AudioStreamPlayer2D" parent="StaticBody2D" unique_id=1217717128 groups=["sound"]]
 stream = ExtResource("2_npid4")
@@ -25,3 +21,19 @@ autoplay = true
 max_distance = 1000.0
 panning_strength = 3.0
 parameters/looping = true
+
+[node name="PortalSound" type="AudioStreamPlayer2D" parent="StaticBody2D" unique_id=1904419193 groups=["sound"]]
+stream = ExtResource("2_npid4")
+autoplay = true
+max_distance = 1094.0
+attenuation = 0.0
+panning_strength = 3.0
+parameters/looping = true
+
+[node name="PortalSoundSprite" type="Polygon2D" parent="StaticBody2D/PortalSound" unique_id=774619328]
+position = Vector2(3, 1)
+polygon = PackedVector2Array(-25, -2, -12, -18, 12, -17, 12, 14, -11, 15)
+
+[node name="MainSoundSprite" type="Polygon2D" parent="StaticBody2D" unique_id=926557385]
+position = Vector2(3, 1)
+polygon = PackedVector2Array(-19, -3, -12, -18, 12, -17, 18, -3, 12, 14, -11, 15)

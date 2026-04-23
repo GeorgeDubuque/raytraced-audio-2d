@@ -9,6 +9,7 @@ const DEBUG_RAY_THICKNESS: float = 2.0
 @export var num_rays: int = 16
 @export var draw_debug_rays: bool = false
 @export var draw_penetretive_rays: bool = false
+@export var draw_portal_positions: bool = false
 @export var max_reverb_distance: float = 2000.0
 @export var max_ray_distance: float = 2000.0
 @export var max_wall_thickness: float = 50.0
@@ -19,6 +20,7 @@ class SoundData:
 	var sound: RaytracedSound
 	var hit_count: int = 0
 	var portal_locations: Array[Vector2]
+	var portal_location: Vector2 = Vector2.ZERO
 
 	func _init(new_sound: RaytracedSound):
 		sound = new_sound
@@ -46,7 +48,6 @@ var occlusion_rays: Array[OcclusionRay]
 var prev_pos: Vector2
 var sound_nodes: Array[RaytracedSound]
 var reverb_effect: AudioEffectReverb
-
 var sound_data: Dictionary[int, SoundData]
 
 @onready var label_room_size: Label = $CanvasLayer/VBoxContainer/Label_RoomSize
@@ -85,52 +86,50 @@ func _on_node_removed(node: Node) -> void:
 	sound_nodes.erase(node)
 
 
-func calculate_occlusion_for_sound(curr_sound_data: SoundData) -> void:
-	# set occlusion amount for each sound source
-	var percentage_rays_hit_sound = float(curr_sound_data.hit_count) / num_rays
-
+func get_contact_points_along_ray(start: Vector2, end: Vector2, exclude: Array) -> Array[Vector2]:
 	var space_state = get_world_2d().direct_space_state
+	var hit_target: bool = false
+	var curr_pos: Vector2 = start
+	var contact_points: Array[Vector2] = []
+	# raycast from player to gather all entry points to walls
+	while !hit_target:
+		var query = PhysicsRayQueryParameters2D.create(curr_pos, end)
+		query.exclude = exclude
+		var result = space_state.intersect_ray(query)
+
+		if result and result.collider:
+			curr_pos = (result.position + (end - start).normalized() * 1)
+			contact_points.append(curr_pos)
+		else:
+			hit_target = true
+
+	return contact_points
+
+
+func calculate_occlusion_for_sound(sound: RaytracedSound) -> void:
+	var curr_sound_data: SoundData = sound_data.get(sound.get_instance_id(), SoundData.new(sound))
+	sound_data[sound.get_instance_id()] = curr_sound_data
+
+	var percentage_rays_hit_sound = float(curr_sound_data.hit_count) / num_rays
 
 	var occlusion_ray: OcclusionRay = OcclusionRay.new()
 	occlusion_ray.sound = curr_sound_data.sound
-	var curr_pos: Vector2 = global_position
-	var target_pos: Vector2 = curr_sound_data.sound.global_position
-	var hit_target: bool = false
 	var exclusions: Array = [get_parent(), curr_sound_data.sound.get_rid()]
 
-	# raycast from player to gather all entry points to walls
-	while !hit_target:
-		var query = PhysicsRayQueryParameters2D.create(curr_pos, target_pos)
-		query.exclude = exclusions
-		var result = space_state.intersect_ray(query)
-
-		if result and result.collider:
-			curr_pos = (
-				result.position
-				+ (curr_sound_data.sound.global_position - curr_pos).normalized() * 1
-			)
-			occlusion_ray.entry_points.append(curr_pos)
-		else:
-			hit_target = true
-
-	hit_target = false
-	curr_pos = curr_sound_data.sound.global_position
-	target_pos = global_position
+	var entry_points = get_contact_points_along_ray(
+		global_position, curr_sound_data.sound.global_position, exclusions
+	)
 	# raycast from sound to player to gather all exit points of walls
-	while !hit_target:
-		var query = PhysicsRayQueryParameters2D.create(curr_pos, global_position)
-		query.exclude = exclusions
-		var result = space_state.intersect_ray(query)
-		if result and result.collider:
-			curr_pos = result.position + (global_position - curr_pos).normalized() * 1
-			occlusion_ray.exit_points.append(curr_pos)
-		else:
-			hit_target = true
+	var exit_points = get_contact_points_along_ray(
+		curr_sound_data.sound.global_position, global_position, exclusions
+	)
+	occlusion_ray.entry_points = entry_points
+	occlusion_ray.exit_points = exit_points
 
 	if occlusion_ray.entry_points.size() != occlusion_ray.exit_points.size():
 		print(
 			(
-				"What the fuck:\n entry points: %d \n exit points: %d \n"
+				"Entry and exit points aren't the same length; truncating. %d, %d"
 				% [occlusion_ray.entry_points.size(), occlusion_ray.exit_points.size()]
 			)
 		)
@@ -160,52 +159,8 @@ func calculate_occlusion_for_sound(curr_sound_data: SoundData) -> void:
 		)
 	)
 
-
-func _process(_delta: float) -> void:
-	if prev_pos == global_position:
-		return
-
-	audio_rays.clear()
-	sound_data.clear()
-	occlusion_rays.clear()
-
-	# gather ray data
-	for i in range(num_rays):
-		var angle = (TAU / num_rays) * i
-		var dir = Vector2.RIGHT.rotated(angle)
-		var new_ray = cast_ray(dir)
-		new_ray.color = Color.RED
-		audio_rays.append(new_ray)
-
-	for sound_node: RaytracedSound in sound_nodes:
-		var sound_id := sound_node.get_instance_id()
-		var curr_sound_data: SoundData = sound_data.get(sound_id, SoundData.new(sound_node))
-		sound_data[sound_id] = curr_sound_data
-		calculate_occlusion_for_sound(curr_sound_data)
-
-	# compute reverb from rays that bounced back to the player
-	var avg_reverb_distance = 0.0
-	var echo_rays: Array[AudioRay] = audio_rays.filter(func(r): return r.reflected_to_player)
-	if echo_rays.size() > 0:
-		for ray: AudioRay in echo_rays:
-			avg_reverb_distance += ray.reflection_distance
-		avg_reverb_distance /= echo_rays.size()
-		#reverb_effect.wet = 1.0
-	else:
-		reverb_effect.wet = 0.0
-
-	reverb_effect.wet = clampf(float(echo_rays.size()) / num_rays, 0.0, 1.0)
-	reverb_effect.room_size = (
-		clampf(avg_reverb_distance / max_reverb_distance, 0.0, 1.0) * reverb_effect.wet
-	)
-
-	label_room_size.text = "Room Size: %f" % reverb_effect.room_size
-	label_inside_outside.text = "Wet: %f" % reverb_effect.wet
-	label_reverb_distance.text = "Reverb Distance: %f" % avg_reverb_distance
-
-	queue_redraw()
-
-	prev_pos = global_position
+	# if curr_sound_data.portal_locations.size() > 0:
+	# 	curr_sound_data.portal_location /= curr_sound_data.portal_locations.size()
 
 
 func cast_ray(dir: Vector2) -> AudioRay:
@@ -251,8 +206,15 @@ func cast_ray(dir: Vector2) -> AudioRay:
 					)
 					curr_sound_data.hit_count += 1
 
-					if new_ray.last_line_of_sight:
+					if (
+						new_ray.last_line_of_sight
+						and (
+							new_ray.reflection_distance
+							< curr_sound_data.sound.sound.max_distance * 2
+						)
+					):
 						curr_sound_data.portal_locations.append(new_ray.last_line_of_sight)
+						curr_sound_data.portal_location += new_ray.last_line_of_sight
 
 					sound_data[sound_id] = curr_sound_data
 
@@ -279,6 +241,73 @@ func cast_ray(dir: Vector2) -> AudioRay:
 	return new_ray
 
 
+func _process(_delta: float) -> void:
+	if prev_pos == global_position:
+		return
+
+	audio_rays.clear()
+	sound_data.clear()
+	occlusion_rays.clear()
+
+	var space_state = get_world_2d().direct_space_state
+	# gather ray data
+	for i in range(num_rays):
+		var angle = (TAU / num_rays) * i
+		var dir = Vector2.RIGHT.rotated(angle)
+		var new_ray = cast_ray(dir)
+		new_ray.color = Color.RED
+		audio_rays.append(new_ray)
+
+	for sound_node: RaytracedSound in sound_nodes:
+		calculate_occlusion_for_sound(sound_node)
+		var curr_sound_data = sound_data[sound_node.get_instance_id()]
+		# should portal
+		var los_query = PhysicsRayQueryParameters2D.create(
+			curr_sound_data.sound.global_position, global_position
+		)
+		los_query.exclude = [curr_sound_data.sound.collider]
+
+		var result = space_state.intersect_ray(los_query)
+		if result and result.collider != get_parent():
+			if curr_sound_data.portal_locations.size() > 0:
+				var avg_portal_loc: Vector2 = Vector2.ZERO
+				for portal_loc in curr_sound_data.portal_locations:
+					avg_portal_loc += portal_loc
+				avg_portal_loc /= curr_sound_data.portal_locations.size()
+				var actual_pos = (
+					global_position + (avg_portal_loc - global_position).normalized() * 500
+				)
+				sound_node.portal_sound.global_position = avg_portal_loc
+			else:
+				sound_node.portal_sound.position = Vector2.ZERO
+		else:
+			sound_node.portal_sound.position = Vector2.ZERO
+
+	# compute reverb from rays that bounced back to the player
+	var avg_reverb_distance = 0.0
+	var echo_rays: Array[AudioRay] = audio_rays.filter(func(r): return r.reflected_to_player)
+	if echo_rays.size() > 0:
+		for ray: AudioRay in echo_rays:
+			avg_reverb_distance += ray.reflection_distance
+		avg_reverb_distance /= echo_rays.size()
+		#reverb_effect.wet = 1.0
+	else:
+		reverb_effect.wet = 0.0
+
+	reverb_effect.wet = clampf(float(echo_rays.size()) / num_rays, 0.0, 1.0)
+	reverb_effect.room_size = (
+		clampf(avg_reverb_distance / max_reverb_distance, 0.0, 1.0) * reverb_effect.wet
+	)
+
+	label_room_size.text = "Room Size: %f" % reverb_effect.room_size
+	label_inside_outside.text = "Wet: %f" % reverb_effect.wet
+	label_reverb_distance.text = "Reverb Distance: %f" % avg_reverb_distance
+
+	queue_redraw()
+
+	prev_pos = global_position
+
+
 func _draw() -> void:
 	if draw_debug_rays:
 		for audio_ray in audio_rays:
@@ -296,24 +325,6 @@ func _draw() -> void:
 
 	if draw_penetretive_rays:
 		for occlusion_ray: OcclusionRay in occlusion_rays:
-			# if occlusion_ray.sound.line_of_sight_points.size() > 0:
-			# 	var avg_portal_position: Vector2 = Vector2.ZERO
-			# 	if occlusion_ray.entry_points.size() == 0:
-			# 		avg_portal_position = occlusion_ray.sound.global_position
-
-			# 	else:
-			# 		for last_los_pos in occlusion_ray.sound.line_of_sight_points:
-			# 			avg_portal_position += last_los_pos
-			# 		avg_portal_position /= occlusion_ray.sound.line_of_sight_points.size()
-			# 	draw_circle(to_local(avg_portal_position), 10, occlusion_ray.sound.color)
-			# 	draw_line(
-			# 		to_local(global_position),
-			# 		to_local(avg_portal_position),
-			# 		occlusion_ray.sound.color,
-			# 		DEBUG_RAY_THICKNESS
-			# 	)
-			# 	occlusion_ray.sound.line_of_sight_points.clear()
-
 			var start_pos: Vector2 = to_local(global_position)
 			var shortest_list_length = min(
 				occlusion_ray.entry_points.size(), occlusion_ray.exit_points.size()
@@ -380,3 +391,17 @@ func _draw() -> void:
 				14,
 				Color.WHITE
 			)
+			draw_string(
+				ThemeDB.fallback_font,
+				label_pos + Vector2(0, -60),
+				"Attenuation: %.1f" % occlusion_ray.sound.sound.get_attenuation(),
+				HORIZONTAL_ALIGNMENT_CENTER,
+				-1,
+				14,
+				Color.WHITE
+			)
+
+	if draw_portal_positions:
+		for curr_sound_data: SoundData in sound_data.values():
+			if curr_sound_data.portal_locations.size() > 0:
+				draw_circle(to_local(curr_sound_data.portal_location), 5.0, Color.PURPLE, true)

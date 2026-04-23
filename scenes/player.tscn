@@ -9,6 +9,7 @@ radius = 50.0
 
 [node name="Player" type="Node2D" unique_id=375442914]
 script = ExtResource("1_4flbx")
+speed = 50.0
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=322201759]
 motion_mode = 1
