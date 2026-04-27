@@ -49,6 +49,7 @@ var prev_pos: Vector2
 var sound_nodes: Array[RaytracedSound]
 var reverb_effect: AudioEffectReverb
 var sound_data: Dictionary[int, SoundData]
+var thread: Thread
 
 @onready var label_room_size: Label = $CanvasLayer/VBoxContainer/Label_RoomSize
 @onready var label_inside_outside: Label = $CanvasLayer/VBoxContainer/Label_InsideOutside
@@ -241,7 +242,7 @@ func cast_ray(dir: Vector2) -> AudioRay:
 	return new_ray
 
 
-func _process(_delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if prev_pos == global_position:
 		return
 
