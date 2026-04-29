@@ -13,8 +13,9 @@ position = Vector2(-4160, -1070)
 speed = 800.0
 
 [node name="RaytracedAudioListener" parent="Player/CharacterBody2D" parent_id_path=PackedInt32Array(375442914, 322201759) index="3" unique_id=1741400250]
+max_bounces = 50
 draw_penetretive_rays = false
-max_wall_thickness = 100.0
+max_wall_thickness = 70.0
 wall_thickenss_occlusion_weight = 0.816
 
 [node name="Environment" type="Node2D" parent="." unique_id=986683072]
@@ -59,6 +60,7 @@ position = Vector2(-4420, -1950)
 [node name="Sound" parent="Environment/Sound7/StaticBody2D" parent_id_path=PackedInt32Array(1917325130, 430496697) index="1" unique_id=1217717128]
 stream = ExtResource("4_plvai")
 max_distance = 3000.0
+attenuation = 2.0
 
 [editable path="Player"]
 [editable path="Environment/Sound7"]
