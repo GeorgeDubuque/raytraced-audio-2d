@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="RaytracedAudio-2d"
-run/main_scene="uid://c0th50pdobsul"
+run/main_scene="uid://b7fk55p4uk10x"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

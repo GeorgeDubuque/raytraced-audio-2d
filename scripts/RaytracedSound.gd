@@ -17,6 +17,7 @@ var color: Color = Color.from_hsv(randf(), randf_range(0.2, 0.6), randf_range(0.
 @onready var sprite_portal_sound: Polygon2D = $PortalSound/PortalSoundSprite
 
 
+
 func _draw() -> void:
 	var sound_node := get_node_or_null("Sound") as AudioStreamPlayer2D
 	if sound_node:
