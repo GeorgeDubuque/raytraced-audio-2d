@@ -80,6 +80,7 @@ class SnapshotShape:
 	var seg_starts: PackedVector2Array
 	var seg_ends: PackedVector2Array
 	var normals: PackedVector2Array
+	var aabb: Rect2
 
 
 class RayHit:
@@ -259,6 +260,10 @@ func _build_frame_snapshot() -> Array[SnapshotShape]:
 		if cached.is_circle:
 			shape.center = gxform.origin
 			shape.radius = cached.radius
+			shape.aabb = Rect2(
+				shape.center - Vector2(shape.radius, shape.radius),
+				Vector2(shape.radius * 2.0, shape.radius * 2.0)
+			)
 		elif cached.is_concave:
 			var verts: PackedVector2Array = cached.local_verts
 			var starts := PackedVector2Array()
@@ -273,6 +278,7 @@ func _build_frame_snapshot() -> Array[SnapshotShape]:
 			shape.seg_starts = starts
 			shape.seg_ends = ends
 			shape.normals = norms
+			shape.aabb = _aabb_of_segments(starts, ends)
 		else:
 			var verts: PackedVector2Array = cached.local_verts
 			var gv: Array[Vector2] = []
@@ -298,6 +304,7 @@ func _build_frame_snapshot() -> Array[SnapshotShape]:
 			shape.seg_starts = starts
 			shape.seg_ends = ends
 			shape.normals = norms
+			shape.aabb = _aabb_of_segments(starts, ends)
 		snap.append(shape)
 	return snap
 
@@ -312,6 +319,46 @@ func _build_sound_infos() -> Array[SoundInfo]:
 			info.max_distance = s.sound.max_distance
 			infos.append(info)
 	return infos
+
+
+static func _aabb_of_segments(starts: PackedVector2Array, ends: PackedVector2Array) -> Rect2:
+	var min_x: float = INF
+	var min_y: float = INF
+	var max_x: float = -INF
+	var max_y: float = -INF
+	for p in starts:
+		min_x = minf(min_x, p.x)
+		min_y = minf(min_y, p.y)
+		max_x = maxf(max_x, p.x)
+		max_y = maxf(max_y, p.y)
+	for p in ends:
+		min_x = minf(min_x, p.x)
+		min_y = minf(min_y, p.y)
+		max_x = maxf(max_x, p.x)
+		max_y = maxf(max_y, p.y)
+	return Rect2(min_x, min_y, max_x - min_x, max_y - min_y)
+
+
+static func _ray_hits_aabb(origin: Vector2, dir: Vector2, aabb: Rect2) -> bool:
+	var t_min: float = -INF
+	var t_max: float = INF
+	if absf(dir.x) < 1e-8:
+		if origin.x < aabb.position.x or origin.x > aabb.end.x:
+			return false
+	else:
+		var t1: float = (aabb.position.x - origin.x) / dir.x
+		var t2: float = (aabb.end.x - origin.x) / dir.x
+		t_min = maxf(t_min, minf(t1, t2))
+		t_max = minf(t_max, maxf(t1, t2))
+	if absf(dir.y) < 1e-8:
+		if origin.y < aabb.position.y or origin.y > aabb.end.y:
+			return false
+	else:
+		var t1: float = (aabb.position.y - origin.y) / dir.y
+		var t2: float = (aabb.end.y - origin.y) / dir.y
+		t_min = maxf(t_min, minf(t1, t2))
+		t_max = minf(t_max, maxf(t1, t2))
+	return t_max >= t_min and t_max > 1e-4 and t_min <= 1.0
 
 
 static func _ray_seg(origin: Vector2, dir: Vector2, a: Vector2, b: Vector2) -> RayHit:
@@ -357,6 +404,8 @@ static func _find_hit(origin: Vector2, dir: Vector2, snapshot: Array, skip_playe
 	var best: RayHit = null
 	for shape: SnapshotShape in snapshot:
 		if skip_player and shape.is_player:
+			continue
+		if not _ray_hits_aabb(origin, dir, shape.aabb):
 			continue
 		if shape.is_circle:
 			var r: RayHit = _ray_circle(origin, dir, shape.center, shape.radius)
