@@ -17,7 +17,6 @@ var color: Color = Color.from_hsv(randf(), randf_range(0.2, 0.6), randf_range(0.
 @onready var sprite_portal_sound: Polygon2D = $PortalSound/PortalSoundSprite
 
 
-
 func _draw() -> void:
 	var sound_node := get_node_or_null("Sound") as AudioStreamPlayer2D
 	if sound_node:
@@ -82,7 +81,7 @@ func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int) -> vo
 
 func set_volume_ratio(ratio: float) -> void:
 	occlusion_percentage = ratio
-	target_cutoff = lerp(0.0, 20000.0, ratio)
+	target_cutoff = lerp(20000.0, 0.0, ratio)
 
 
 static func _ensure_reverb_bus() -> void:

@@ -14,7 +14,8 @@ const DEBUG_RAY_THICKNESS: float = 2.0
 @export var max_reverb_distance: float = 2000.0
 @export var max_ray_distance: float = 2000.0
 @export var max_wall_thickness: float = 50.0
-@export_range(0.0, 1.0) var wall_thickenss_occlusion_weight: float = 0.5
+@export var occlusion_curve: Curve
+@export_range(0.0, 1.0) var wall_thickness_occlusion_weight: float = 0.5
 
 
 class SoundData:
@@ -55,7 +56,13 @@ class AudioCollision:
 	var local_verts: PackedVector2Array = []
 	var is_concave: bool = false
 
-	func _init(in_body_id: RID, in_xform: Transform2D, in_is_player: bool, in_is_sound: bool, in_instance_id: int):
+	func _init(
+		in_body_id: RID,
+		in_xform: Transform2D,
+		in_is_player: bool,
+		in_is_sound: bool,
+		in_instance_id: int
+	):
 		body_id = in_body_id
 		local_xform = in_xform
 		is_player = in_is_player
@@ -143,6 +150,7 @@ var _shape_cache: Array[AudioCollision]
 @onready var label_room_size: Label = $CanvasLayer/VBoxContainer/Label_RoomSize
 @onready var label_inside_outside: Label = $CanvasLayer/VBoxContainer/Label_InsideOutside
 @onready var label_reverb_distance: Label = $CanvasLayer/VBoxContainer/Label_ReverbDistance
+@onready var label_thread_time: Label = $CanvasLayer/VBoxContainer/Label_ThreadTime
 
 
 func _ready() -> void:
@@ -169,16 +177,23 @@ func _build_body_shapes(body: Node) -> Array[AudioCollision]:
 		var shape_type = PhysicsServer2D.shape_get_type(shape_rid)
 		var shape_data = PhysicsServer2D.shape_get_data(shape_rid)
 		var local_xform: Transform2D = PhysicsServer2D.body_get_shape_transform(body_rid, i)
-		var entry := AudioCollision.new(body_rid, local_xform, is_player, is_sound, body.get_instance_id() if is_sound else -1)
+		var entry := AudioCollision.new(
+			body_rid, local_xform, is_player, is_sound, body.get_instance_id() if is_sound else -1
+		)
 		match shape_type:
 			PhysicsServer2D.SHAPE_CIRCLE:
 				entry.is_circle = true
 				entry.radius = float(shape_data)
 			PhysicsServer2D.SHAPE_RECTANGLE:
 				var he: Vector2 = shape_data
-				entry.local_verts = PackedVector2Array([
-					Vector2(-he.x, -he.y), Vector2(he.x, -he.y),
-					Vector2(he.x,  he.y),  Vector2(-he.x, he.y)])
+				entry.local_verts = PackedVector2Array(
+					[
+						Vector2(-he.x, -he.y),
+						Vector2(he.x, -he.y),
+						Vector2(he.x, he.y),
+						Vector2(-he.x, he.y)
+					]
+				)
 			PhysicsServer2D.SHAPE_CONVEX_POLYGON:
 				entry.local_verts = shape_data as PackedVector2Array
 			PhysicsServer2D.SHAPE_CONCAVE_POLYGON:
@@ -191,11 +206,12 @@ func _build_body_shapes(body: Node) -> Array[AudioCollision]:
 
 
 func _cache_shape_data() -> Array[AudioCollision]:
-	var shape_cache:Array[AudioCollision] = []
+	var shape_cache: Array[AudioCollision] = []
 	for body in get_tree().root.find_children("*", "CollisionObject2D", true, false):
 		shape_cache.append_array(_build_body_shapes(body))
 
 	return shape_cache
+
 
 func _setup_reverb_bus() -> void:
 	if AudioServer.get_bus_index("Reverb") != -1:
@@ -220,7 +236,9 @@ func _on_node_removed(node: Node) -> void:
 	sound_nodes.erase(node)
 	if node is RaytracedSound:
 		var body_rid: RID = (node as CollisionObject2D).get_rid()
-		_shape_cache = _shape_cache.filter(func(ac: AudioCollision) -> bool: return ac.body_id != body_rid)
+		_shape_cache = _shape_cache.filter(
+			func(ac: AudioCollision) -> bool: return ac.body_id != body_rid
+		)
 
 
 func _build_frame_snapshot() -> Array[SnapshotShape]:
@@ -228,8 +246,10 @@ func _build_frame_snapshot() -> Array[SnapshotShape]:
 	for cached: AudioCollision in _shape_cache:
 		if not cached.body_id.is_valid():
 			continue
-		var global_body_xform := PhysicsServer2D.body_get_state(
-			cached.body_id, PhysicsServer2D.BODY_STATE_TRANSFORM) as Transform2D
+		var global_body_xform := (
+			PhysicsServer2D.body_get_state(cached.body_id, PhysicsServer2D.BODY_STATE_TRANSFORM)
+			as Transform2D
+		)
 		var gxform: Transform2D = global_body_xform * cached.local_xform
 		var shape := SnapshotShape.new()
 		shape.is_circle = cached.is_circle
@@ -259,7 +279,8 @@ func _build_frame_snapshot() -> Array[SnapshotShape]:
 			for v in verts:
 				gv.append(gxform * v)
 			var centroid: Vector2 = Vector2.ZERO
-			for v in gv: centroid += v
+			for v in gv:
+				centroid += v
 			centroid /= gv.size()
 			var starts := PackedVector2Array()
 			var ends := PackedVector2Array()
@@ -365,8 +386,13 @@ static func _sound_max_dist(sound_infos: Array, sid: int) -> float:
 
 
 func _cast_ray_snapshot(
-	dir: Vector2, snapshot: Array, listener_pos: Vector2,
-	sound_infos: Array, state: Dictionary, n_bounces: int, ray_dist: float
+	dir: Vector2,
+	snapshot: Array,
+	listener_pos: Vector2,
+	sound_infos: Array,
+	state: Dictionary,
+	n_bounces: int,
+	ray_dist: float
 ) -> AudioRay:
 	var ray := AudioRay.new()
 	ray.points.append(listener_pos)
@@ -435,13 +461,20 @@ func _get_contact_points_snapshot(
 
 
 func _calculate_occlusion_snapshot(
-	sound_info: SoundInfo, listener_pos: Vector2, this_snapshot: Array,
-	state: Dictionary, n_rays: int
+	sound_info: SoundInfo,
+	listener_pos: Vector2,
+	this_snapshot: Array,
+	state: Dictionary,
+	n_rays: int
 ) -> OcclusionResult:
 	var sid: int = sound_info.instance_id
 	var s_pos: Vector2 = sound_info.position
-	var entry: Array[Vector2] = _get_contact_points_snapshot(listener_pos, s_pos, this_snapshot, sid)
-	var exit_: Array[Vector2] = _get_contact_points_snapshot(s_pos, listener_pos, this_snapshot, sid)
+	var entry: Array[Vector2] = _get_contact_points_snapshot(
+		listener_pos, s_pos, this_snapshot, sid
+	)
+	var exit_: Array[Vector2] = _get_contact_points_snapshot(
+		s_pos, listener_pos, this_snapshot, sid
+	)
 	var n: int = min(entry.size(), exit_.size())
 	var thickness: float = 0.0
 	for i in range(n):
@@ -475,13 +508,22 @@ func _do_background_work(args: WorkArgs) -> BackgroundResult:
 	result.num_rays = n_rays
 
 	for i in range(n_rays):
-		result.rays.append(_cast_ray_snapshot(
-			Vector2.RIGHT.rotated((TAU / n_rays) * i),
-			snapshot, listener_pos, sound_infos, state, n_bounces, ray_dist))
+		result.rays.append(
+			_cast_ray_snapshot(
+				Vector2.RIGHT.rotated((TAU / n_rays) * i),
+				snapshot,
+				listener_pos,
+				sound_infos,
+				state,
+				n_bounces,
+				ray_dist
+			)
+		)
 
 	for info: SoundInfo in sound_infos:
-		result.occlusion.append(_calculate_occlusion_snapshot(
-			info, listener_pos, snapshot, state, n_rays))
+		result.occlusion.append(
+			_calculate_occlusion_snapshot(info, listener_pos, snapshot, state, n_rays)
+		)
 
 	for r: AudioRay in result.rays:
 		if r.reflected_to_player:
@@ -523,31 +565,34 @@ func _apply_results(results: BackgroundResult) -> void:
 		sd.portal_locations.assign(occ.portal_locs)
 		sound_data[occ.sound_id] = sd
 
-		var thick_pct: float = 1.0 - clampf(occ.thickness / max_wall_thickness, 0.0, 1.0)
-		var ray_pct: float = float(occ.hit_count) / float(occ.num_rays)
-		sound_node.set_volume_ratio(
-			thick_pct * wall_thickenss_occlusion_weight
-			+ ray_pct * (1.0 - wall_thickenss_occlusion_weight)
-		)
-
 		if occ.blocked:
-			if occ.portal_locs.size() > 0:
-				var avg: Vector2 = Vector2.ZERO
-				for loc: Vector2 in occ.portal_locs:
-					avg += loc
-				avg /= occ.portal_locs.size()
-				sound_node.portal_sound.global_position = (
-					global_position + (avg - global_position).normalized() * 500.0
-				)
-				sound_node.portal_sound.volume_db = linear_to_db(
-					float(occ.portal_locs.size()) / float(occ.num_rays)
-				)
-			else:
-				sound_node.portal_sound.position = Vector2.ZERO
-				sound_node.portal_sound.volume_db = -100.0
+			var thick_pct: float = clampf(occ.thickness / max_wall_thickness, 0.0, 1.0)
+			var ray_pct: float = float(occ.hit_count) / float(occ.num_rays)
+			var occlusion_pct: float = (
+				thick_pct * wall_thickness_occlusion_weight
+				+ ray_pct * (1.0 - wall_thickness_occlusion_weight)
+			)
+			sound_node.set_volume_ratio(occlusion_curve.sample(occlusion_pct))
+		else:
+			sound_node.set_volume_ratio(0)
+
+		# calculate portal location and volume
+		# NOTE: portal location could be set to the avg global position and then
+		# calculate volume and attenuation based off the distance from portal to original sound
+		if occ.blocked and occ.portal_locs.size() > 0:
+			var avg: Vector2 = Vector2.ZERO
+			for loc: Vector2 in occ.portal_locs:
+				avg += loc
+			avg /= occ.portal_locs.size()
+			sound_node.portal_sound.global_position = (
+				global_position + (avg - global_position).normalized() * 500.0
+			)
+			sound_node.portal_sound.volume_db = linear_to_db(
+				float(occ.portal_locs.size()) / float(occ.num_rays)
+			)
 		else:
 			sound_node.portal_sound.position = Vector2.ZERO
-			sound_node.portal_sound.volume_db = 0.0
+			sound_node.portal_sound.volume_db = -100.0
 
 	var n: int = results.num_rays
 	var ec: int = results.echo_count
@@ -560,13 +605,18 @@ func _apply_results(results: BackgroundResult) -> void:
 	queue_redraw()
 
 
+var thread_start_time = 0.0
+
+
 func _physics_process(_delta: float) -> void:
-
-
 	if thread.is_started() and not thread.is_alive():
+		label_thread_time.text = (
+			"Thread Time: %f" % ((Time.get_ticks_msec() - thread_start_time) / 1000.0)
+		)
 		_apply_results(thread.wait_to_finish() as BackgroundResult)
 
-	if not thread.is_started() and global_position != prev_pos:
+	if not thread.is_started():
+		thread_start_time = Time.get_ticks_msec()
 		prev_pos = global_position
 		var args := WorkArgs.new()
 		args.snapshot = _build_frame_snapshot()
@@ -604,10 +654,11 @@ func _draw() -> void:
 				var p2 = to_local(
 					occlusion_ray.exit_points[occlusion_ray.exit_points.size() - 1 - i]
 				)
-				draw_circle(p1, 5, Color.GREEN)
-				draw_circle(p2, 5, Color.RED)
+				var pair_color := Color.from_hsv(float(i) / max(shortest_list_length, 1), 0.8, 0.9)
+				draw_circle(p1, 5, pair_color)
+				draw_circle(p2, 5, pair_color)
 				draw_line(start_pos, p1, Color.YELLOW_GREEN, DEBUG_RAY_THICKNESS)
-				draw_dashed_line(p1, p2, Color.PALE_VIOLET_RED, DEBUG_RAY_THICKNESS)
+				draw_dashed_line(p1, p2, pair_color, DEBUG_RAY_THICKNESS)
 				start_pos = p2
 
 			if occlusion_ray.exit_points.size() > 0:

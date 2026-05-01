@@ -30,3 +30,7 @@ text = "Inside/Outside: 0.65"
 [node name="Label_ReverbDistance" type="Label" parent="CanvasLayer/VBoxContainer" unique_id=1559477123]
 layout_mode = 2
 text = "Inside/Outside: 0.65"
+
+[node name="Label_ThreadTime" type="Label" parent="CanvasLayer/VBoxContainer" unique_id=1218645779]
+layout_mode = 2
+text = "ThreadTime: 0.65"

@@ -2,7 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://djd4lge8h83n" path="res://scenes/player.tscn" id="1_plvai"]
 [ext_resource type="PackedScene" uid="uid://cloyojniitmyp" path="res://scenes/Sound.tscn" id="2_vkcgd"]
+[ext_resource type="Curve" uid="uid://ovs1kuq43ikt" path="res://res/occlusion_curve.tres" id="2_yvmk3"]
 [ext_resource type="AudioStream" uid="uid://dfl5tiy48nw6h" path="res://sounds/Dj Khaled - I Got The Keys (Feat. Jay-Z, Future) [28xrtE_OOFE].mp3" id="4_plvai"]
+[ext_resource type="PackedScene" uid="uid://bdgwmvb1c2jr8" path="res://scenes/door.tscn" id="4_vkcgd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1rrhw"]
 
@@ -13,10 +15,9 @@ position = Vector2(-4160, -1070)
 speed = 800.0
 
 [node name="RaytracedAudioListener" parent="Player/CharacterBody2D" parent_id_path=PackedInt32Array(375442914, 322201759) index="3" unique_id=1741400250]
-max_bounces = 50
-draw_penetretive_rays = false
-max_wall_thickness = 70.0
-wall_thickenss_occlusion_weight = 0.816
+max_bounces = 20
+max_wall_thickness = 300.0
+occlusion_curve = ExtResource("2_yvmk3")
 
 [node name="Environment" type="Node2D" parent="." unique_id=986683072]
 
@@ -62,5 +63,64 @@ stream = ExtResource("4_plvai")
 max_distance = 3000.0
 attenuation = 2.0
 
+[node name="Wall34" type="StaticBody2D" parent="Environment" unique_id=558279992]
+position = Vector2(1719.9999, -1689.9998)
+scale = Vector2(2.9999995, 37.44)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall34" unique_id=198148086]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall38" type="StaticBody2D" parent="Environment" unique_id=2079292036]
+position = Vector2(1840.0001, -1940.0001)
+rotation = 0.7853982
+scale = Vector2(2.9999993, 14.975999)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall38" unique_id=481749847]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall35" type="StaticBody2D" parent="Environment" unique_id=1175685132]
+position = Vector2(2749.9998, -1689.9998)
+scale = Vector2(2.9999995, 37.44)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall35" unique_id=2085069083]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall36" type="StaticBody2D" parent="Environment" unique_id=161478622]
+position = Vector2(2249.9995, -2040)
+rotation = -1.5707964
+scale = Vector2(2.9999995, 50.999996)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall36" unique_id=1581719435]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Wall37" type="StaticBody2D" parent="Environment" unique_id=97088125]
+position = Vector2(2139.9998, -1349.9998)
+rotation = -1.5719053
+scale = Vector2(2.9999988, 39.689987)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Wall37" unique_id=1962341850]
+shape = SubResource("RectangleShape2D_1rrhw")
+
+[node name="Sound8" parent="Environment" unique_id=718485504 instance=ExtResource("2_vkcgd")]
+position = Vector2(2040.0002, -1879.9998)
+
+[node name="Sound" parent="Environment/Sound8/StaticBody2D" parent_id_path=PackedInt32Array(718485504, 430496697) index="1" unique_id=1217717128]
+stream = ExtResource("4_plvai")
+max_distance = 3000.0
+attenuation = 2.0
+
+[node name="Door" parent="." unique_id=818468190 instance=ExtResource("4_vkcgd")]
+position = Vector2(-3920, -1420)
+
+[node name="Door2" parent="." unique_id=1412142607 instance=ExtResource("4_vkcgd")]
+position = Vector2(2540.0002, -1349.9998)
+
 [editable path="Player"]
+[editable path="Player/CharacterBody2D/RaytracedAudioListener"]
 [editable path="Environment/Sound7"]
+[editable path="Environment/Sound8"]
