@@ -6,6 +6,7 @@ const DEBUG_WALL_THICKNESS_LABEL_OFFSET: Vector2 = Vector2(10, -20)
 const DEBUG_RAY_THICKNESS: float = 2.0
 
 @export var max_bounces: int = 10
+@export var max_los_bounces: int = 3
 @export var num_rays: int = 16
 @export var draw_debug_snapshot: bool = false
 @export var draw_debug_rays: bool = false
@@ -123,6 +124,7 @@ class WorkArgs:
 	var sound_infos: Array[SoundInfo]
 	var num_rays: int = 0
 	var max_bounces: int = 0
+	var max_los_bounces: int = 0
 	var max_ray_distance: float = 0.0
 
 
@@ -441,6 +443,7 @@ func _cast_ray_snapshot(
 	sound_infos: Array,
 	state: Dictionary,
 	n_bounces: int,
+	max_los: int,
 	ray_dist: float
 ) -> AudioRay:
 	var ray := AudioRay.new()
@@ -475,12 +478,12 @@ func _cast_ray_snapshot(
 			pos = result.pos + d * PENETRATION_DIST
 		else:
 			var normal: Vector2 = result.normal
-			var los_origin: Vector2 = result.pos + normal * 2.0
-			var los_dir: Vector2 = listener_pos - los_origin
-			var los_hit: RayHit = _find_hit(los_origin, los_dir, snapshot, false)
-			if los_hit != null and los_hit.shape.is_player:
-				ray.last_line_of_sight = result.pos
-				ray.has_los = true
+			if i < max_los:
+				var los_origin: Vector2 = result.pos + normal * 2.0
+				var los_hit: RayHit = _find_hit(los_origin, listener_pos - los_origin, snapshot, false)
+				if los_hit != null and los_hit.shape.is_player:
+					ray.last_line_of_sight = result.pos
+					ray.has_los = true
 			d = d.bounce(normal).normalized()
 			pos = result.pos + normal * PENETRATION_DIST
 	return ray
@@ -550,6 +553,7 @@ func _do_background_work(args: WorkArgs) -> BackgroundResult:
 	var sound_infos: Array = args.sound_infos
 	var n_rays: int = args.num_rays
 	var n_bounces: int = args.max_bounces
+	var max_los: int = args.max_los_bounces
 	var ray_dist: float = args.max_ray_distance
 	var state: Dictionary = {}
 
@@ -565,6 +569,7 @@ func _do_background_work(args: WorkArgs) -> BackgroundResult:
 				sound_infos,
 				state,
 				n_bounces,
+				max_los,
 				ray_dist
 			)
 		)
@@ -673,6 +678,7 @@ func _physics_process(_delta: float) -> void:
 		args.sound_infos = _build_sound_infos()
 		args.num_rays = num_rays
 		args.max_bounces = max_bounces
+		args.max_los_bounces = max_los_bounces
 		args.max_ray_distance = max_ray_distance
 		thread.start(_do_background_work.bind(args))
 

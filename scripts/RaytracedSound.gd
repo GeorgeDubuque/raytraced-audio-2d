@@ -81,7 +81,7 @@ func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int) -> vo
 
 func set_volume_ratio(ratio: float) -> void:
 	occlusion_percentage = ratio
-	target_cutoff = lerp(20000.0, 0.0, ratio)
+	target_cutoff = lerp(20000.0, -1000.0, ratio)
 
 
 static func _ensure_reverb_bus() -> void:
